@@ -96,8 +96,8 @@ contents.each do |row|
 
 		
 	
-	#save_thank_you_letters(id, form_letter)
-	puts "#{name}, #{home_phone}" 
+	save_thank_you_letters(id, form_letter)
+	#puts "#{name}, #{home_phone}" 
 
 end
 
