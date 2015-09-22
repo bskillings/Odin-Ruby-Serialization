@@ -1,3 +1,5 @@
+require "yaml"
+
 class Hangman
 
 	def initialize
@@ -13,9 +15,13 @@ class Hangman
 		@current_word_status = Array.new(@word.length, " _ ")
 		draw_word
 		while @game_won == false && @wrong_guesses.length < 8
-			guess = get_guess
-			compare_word(guess)
-			@game_won = check_if_game_won
+			puts "guess a letter, or type \"game\" to save, load, or exit"
+			action = gets.chomp.downcase
+			if action == "game"
+				game_actions
+			else
+				take_a_turn(action)
+			end
 			draw_man
 			draw_word
 		end
@@ -23,6 +29,11 @@ class Hangman
 		puts "You Lose! Too many guesses!" if @wrong_guesses.length >= 8 
 		puts "The word was #{@word}"
 	end
+
+	def take_a_turn(guess)
+		compare_word(guess)
+		@game_won = check_if_game_won
+		end
 
 	def pick_a_word #choose a word, check for suitability
 		word = ""
@@ -84,6 +95,41 @@ class Hangman
 			end
 		end
 		return no_blanks
+	end
+
+	def game_actions
+		puts "Type \"save\", \"load\", or \"exit\""
+		action = gets.chomp.downcase
+		case action
+		when "save"
+			save_game
+		when "load"
+			load_game
+		when "exit"
+			puts "Please press Ctrl-C to exit"
+			dummy = gets
+		else
+			puts "Did not understand, returning to game"
+		end
+	end
+
+	def save_game 
+		puts "Name your savegame"
+		filename = gets.chomp
+		save_array = Array.new [@word, @current_word_status, @wrong_guesses]
+		File.open("#{filename}.yaml", "w") {|f| f.write(YAML::dump(save_array))}
+		puts "#{filename}.yaml saved"
+	end
+
+	def load_game
+		puts "Type the name of your savegame"
+		filename = gets.chomp
+		file_to_load = File.new("#{filename}.yaml")
+		load_array = YAML::load(file_to_load)
+		puts "#{filename}.yaml loaded"
+		@word = load_array[0]
+		@current_word_status = load_array[1]
+		@wrong_guesses = load_array[2]
 	end
 end
 
